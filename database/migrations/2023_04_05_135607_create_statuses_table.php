@@ -14,7 +14,9 @@ return new class extends Migration
     {
         Schema::create('statuses', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('user_id')->nullable(false);
+            $table->foreignUuid('user_id')
+                ->constrained('users')
+                ->nullable(false);
             $table->string('name')->nullable(false);
             $table->unsignedTinyInteger('position');
 

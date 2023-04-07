@@ -2,19 +2,13 @@
 
 namespace Tests\Unit;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Status;
-use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class StatusTest extends TestCase
 {
     use RefreshDatabase;
-
-    protected function user()
-    {
-        return (User::factory()->create());
-    }
 
     public function test_it_fails_creating_status_without_valid_user()
     {

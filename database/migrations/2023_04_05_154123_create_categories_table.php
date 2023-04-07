@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('parent_id')->nullable(true);
-            $table->foreignUuid('user_id')->nullable(false);
+            $table->foreignUuid('user_id')
+                ->constrained('users')
+                ->nullable(false);
             $table->string('name')->nullable(false);
             $table->text('description');
             $table->unsignedTinyInteger('position');

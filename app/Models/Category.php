@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\UsesUserId;
+use App\Models\Concerns\UsesUuid;
+use App\Models\Relationships\CategoryRelationships;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Concerns\UsesUuid;
-use App\Models\Concerns\UsesUserId;
 
 class Category extends Model
 {
-    use HasFactory, UsesUuid, UsesUserId;
+    use HasFactory, UsesUuid, UsesUserId, CategoryRelationships;
 
     protected $fillable = [
         'name',
