@@ -212,4 +212,32 @@ return [
         // 'ExampleClass' => App\Example\ExampleClass::class,
     ])->toArray(),
 
+
+    /* Custom Application specific configuration */
+
+    'defaults' => [
+        'categories' => [['name' => 'Inbox', 'position' => 1]],
+        'statuses' => [
+            [
+                'name' => 'Not Started',
+                'position' => 1
+            ],
+            [
+                'name' => 'In Progress',
+                'position' => 2
+            ],
+            [
+                'name' => 'Paused',
+                'position' => 3
+            ],
+            [
+                'name' => 'Awaiting Approval',
+                'position' => 4
+            ],
+            [
+                'name' => 'Completed',
+                'position' =>  5
+            ],
+        ],
+    ],
 ];

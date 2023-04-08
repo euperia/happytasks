@@ -120,6 +120,16 @@ class AuthControllerTest extends TestCase
             ],
             'token_type' => 'Bearer',
         ]);
+
+        // check the database
+        $user = User::where('email', $formData['email'])->first();
+        $this->assertNotNull($user);
+        $this->assertInstanceOf(User::class, $user);
+
+        // check the user default categories and statuses have been created
+        $this->assertSame(config('app.defaults.categories')[0]['name'], $user->categories[0]->name);
+        $this->assertSame(config('app.defaults.statuses')[0]['name'], $user->statuses[0]->name);
+        $this->assertSame(config('app.defaults.statuses')[1]['name'], $user->statuses[1]->name);
     }
 
 
@@ -154,6 +164,7 @@ class AuthControllerTest extends TestCase
 
         $this->assertTrue(isset($responseData['access_token']));
         $this->assertFalse(empty($responseData['access_token']));
+
     }
 
 
