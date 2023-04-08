@@ -156,4 +156,31 @@ class AuthControllerTest extends TestCase
         $this->assertFalse(empty($responseData['access_token']));
     }
 
+
+    public function test_logout()
+    {
+        $userData = [
+            'name' => 'Bob Smith',
+            'email' => 'bob@example.net',
+            'password' => 'This$is%A-t35t'
+        ];
+
+         $user = User::create([
+            'name' => $userData['name'],
+            'email' => $userData['email'],
+            'password' => Hash::make($userData['password'])
+         ]);
+
+        $user->createToken('auth_token');
+
+        $this->actingAs($user);
+
+
+        $response = $this->post(route('api.logout'));
+
+        $response->assertJson([
+            'message' => 'You have successfully logged out and the token was successfully deleted'
+        ]);
+    }
+
 }
