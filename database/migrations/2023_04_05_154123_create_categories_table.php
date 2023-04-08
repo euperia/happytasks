@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid('parent_id')->nullable(true);
+            $table->uuid('parent_id')->nullable();
             $table->foreignUuid('user_id')
                 ->constrained('users')
                 ->nullable(false);
-            $table->string('name')->nullable(false);
-            $table->text('description');
+            $table->string('name');
+            $table->text('description')->nullable();
             $table->unsignedTinyInteger('position');
             $table->timestamps();
             $table->softDeletes();
