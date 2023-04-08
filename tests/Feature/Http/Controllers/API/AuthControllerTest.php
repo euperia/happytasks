@@ -2,8 +2,10 @@
 
 namespace Tests\Feature\Http\Controllers\API;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Hash;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Tests\TestCase;
@@ -111,8 +113,47 @@ class AuthControllerTest extends TestCase
         $response = $this->post(route('api.register', $formData));
         $response->assertStatus(ResponseAlias::HTTP_OK);
 
-
+        $response->assertJson([
+            'data' => [
+                'name' => $formData['name'],
+                'email' => $formData['email'],
+            ],
+            'token_type' => 'Bearer',
+        ]);
     }
 
+
+    public function test_login() {
+
+        $userData = [
+            'name' => 'Bob Smith',
+            'email' => 'bob@example.net',
+            'password' => 'This$is%A-t35t'
+        ];
+
+         $user = User::create([
+            'name' => $userData['name'],
+            'email' => $userData['email'],
+            'password' => Hash::make($userData['password'])
+         ]);
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        $formData = [
+            'email' => $userData['email'],
+            'password' => $userData['password']
+        ];
+
+        $response = $this->post(route('api.login'), $formData);
+
+        $response->assertOk();
+        $response->assertJson(['message' => 'Hi ' . $userData['name'] . ', welcome to home']);
+        $response->assertJson(['token_type' => 'Bearer']);
+
+        $responseData = json_decode($response->content(), JSON_OBJECT_AS_ARRAY);
+
+        $this->assertTrue(isset($responseData['access_token']));
+        $this->assertFalse(empty($responseData['access_token']));
+    }
 
 }
