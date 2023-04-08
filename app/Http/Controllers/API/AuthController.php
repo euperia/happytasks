@@ -4,10 +4,12 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
 {
@@ -21,11 +23,19 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(),[
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8'
+            'password' => [
+                'required',
+                Password::min(8)->letters()->mixedCase()->numbers()->symbols(),
+                'confirmed'
+            ]
         ]);
 
         if($validator->fails()){
-            return response()->json($validator->errors());
+            return response()
+                ->json(
+                    $validator->errors(),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
         }
 
         $user = User::create([
