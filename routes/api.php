@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\StatusController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
@@ -19,9 +20,17 @@ Route::post('/register', [AuthController::class, 'register'])->name('api.registe
 Route::post('/login', [AuthController::class, 'login'])->name('api.login');
 
 Route::group(['middleware' => ['auth:sanctum']], function() {
+
     Route::get('/user', function (Request $request) {
         return $request->user();
     })->name('api.user');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('api.logout');
+
+    // Status routes
+
+    Route::prefix('status')->group(function() {
+       Route::get('/{status}', [StatusController::class, 'show'])->name('api.status.get');
+       Route::post('/', [StatusController::class, 'store'])->name('api.status.create');
+    });
 });

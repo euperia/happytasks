@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreStatusRequest;
 use App\Http\Requests\UpdateStatusRequest;
+use App\Http\Resources\StatusResource;
 use App\Models\Status;
 
 class StatusController extends Controller
@@ -22,7 +23,16 @@ class StatusController extends Controller
      */
     public function store(StoreStatusRequest $request)
     {
-        //
+        $data = $request->validated();
+        // update all status positions to accommodate this one
+        Status::where('user_id', auth()->user()->id)
+            ->where('position', '>=', $data['position'])
+            ->increment('position');
+        // now create this one
+        $status = Status::create($data);
+
+        return new StatusResource($status);
+
     }
 
     /**
@@ -30,7 +40,7 @@ class StatusController extends Controller
      */
     public function show(Status $status)
     {
-        //
+        dd($status->toArray());
     }
 
     /**
@@ -38,7 +48,7 @@ class StatusController extends Controller
      */
     public function update(UpdateStatusRequest $request, Status $status)
     {
-        //
+        dd($request->all());
     }
 
     /**
@@ -46,6 +56,6 @@ class StatusController extends Controller
      */
     public function destroy(Status $status)
     {
-        //
+        dd($status->toArray());
     }
 }
