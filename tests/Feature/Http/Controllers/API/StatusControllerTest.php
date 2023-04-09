@@ -22,6 +22,69 @@ class StatusControllerTest extends TestCase
         $this->assertSame(302, $response->status());
     }
 
+    public function test_list_statuses()
+    {
+        $user = User::factory()->create();
+        // add three new statuses so that we can check the position update
+        DB::table('statuses')->insert([
+            ['id' => (string)Str::uuid(), 'name' => 'Status 1', 'position' => 1, 'user_id' => $user->id, 'created_at' => now()],
+            ['id' => (string)Str::uuid(), 'name' => 'Status 2', 'position' => 2, 'user_id' => $user->id, 'created_at' => now()],
+            ['id' => (string)Str::uuid(), 'name' => 'Status 3', 'position' => 3, 'user_id' => $user->id, 'created_at' => now()]
+        ]);
+
+        $statuses = Status::all();
+
+        Sanctum::actingAs($user, ['*']);
+
+        $uri = route('api.status.list');
+        $response = $this->getJson($uri);
+
+        $response->assertOk();
+        $response->assertJson(['data' => [
+            [
+                'id' => $statuses[0]->id,
+                'name' => $statuses[0]->name,
+                'position' => $statuses[0]->position
+            ],
+            [
+                'id' => $statuses[1]->id,
+                'name' => $statuses[1]->name,
+                'position' => $statuses[1]->position
+            ],
+            [
+                'id' => $statuses[2]->id,
+                'name' => $statuses[2]->name,
+                'position' => $statuses[2]->position
+            ],
+        ]]);
+
+    }
+
+    public function test_get_a_status()
+    {
+        $user = User::factory()->create();
+        // add three new statuses so that we can check the position update
+        DB::table('statuses')->insert([
+            ['id' => (string)Str::uuid(), 'name' => 'Status 1', 'position' => 1, 'user_id' => $user->id, 'created_at' => now()],
+            ['id' => (string)Str::uuid(), 'name' => 'Status 2', 'position' => 2, 'user_id' => $user->id, 'created_at' => now()],
+            ['id' => (string)Str::uuid(), 'name' => 'Status 3', 'position' => 3, 'user_id' => $user->id, 'created_at' => now()]
+        ]);
+
+        $status = Status::where('name', 'Status 2')->first();
+
+        Sanctum::actingAs($user, ['*']);
+
+        $uri = route('api.status.get', [$status]);
+        $response = $this->getJson($uri);
+
+        $response->assertOk();
+        $response->assertJson([
+            'id' => $status->id,
+            'name' => $status->name,
+            'position' => $status->position,
+        ]);
+    }
+
 
     public function test_create_new_status_validation()
     {
@@ -202,8 +265,8 @@ class StatusControllerTest extends TestCase
         $response->assertJson($formData);
 
         $this->assertDatabaseHas('statuses', $formData);
-        $this->assertDatabaseHas('statuses', ['name' => 'Status 1' , 'position' => 2]);
-        $this->assertDatabaseHas('statuses', ['name' => 'Status 3' , 'position' => 4]);
+        $this->assertDatabaseHas('statuses', ['name' => 'Status 1', 'position' => 2]);
+        $this->assertDatabaseHas('statuses', ['name' => 'Status 3', 'position' => 4]);
 
     }
 }

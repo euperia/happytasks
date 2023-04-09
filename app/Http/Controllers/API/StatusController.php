@@ -5,8 +5,10 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreStatusRequest;
 use App\Http\Requests\UpdateStatusRequest;
+use App\Http\Resources\StatusCollectionResource;
 use App\Http\Resources\StatusResource;
 use App\Models\Status;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class StatusController extends Controller
 {
@@ -15,7 +17,12 @@ class StatusController extends Controller
      */
     public function index()
     {
-        //
+        $statuses = Status::where('user_id', auth()->user()->id)
+            ->orderBy('position')
+            ->select('id', 'name', 'position')
+            ->get();
+
+        return new StatusCollectionResource($statuses);
     }
 
     /**
@@ -40,7 +47,11 @@ class StatusController extends Controller
      */
     public function show(Status $status)
     {
-        dd($status->toArray());
+        // authorize this?
+        if (auth()->user()->id !== $status->user_id) {
+            throw new UnauthorizedHttpException('Access Denied');
+        }
+        return new StatusResource($status);
     }
 
     /**
