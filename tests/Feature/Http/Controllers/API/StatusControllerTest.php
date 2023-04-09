@@ -22,6 +22,59 @@ class StatusControllerTest extends TestCase
         $this->assertSame(302, $response->status());
     }
 
+
+    public function test_create_new_status_validation()
+    {
+
+        $user = User::factory()->create();
+        // add three new statuses so that we can check the position update
+        DB::table('statuses')->insert([
+            ['id' => (string)Str::uuid(), 'name' => 'Status 1', 'position' => 1, 'user_id' => $user->id, 'created_at' => now()],
+            ['id' => (string)Str::uuid(), 'name' => 'Status 2', 'position' => 2, 'user_id' => $user->id, 'created_at' => now()],
+            ['id' => (string)Str::uuid(), 'name' => 'Status 3', 'position' => 3, 'user_id' => $user->id, 'created_at' => now()]
+        ]);
+
+        Sanctum::actingAs($user, ['*']);
+
+        // validate empty input
+        $formData = [
+            'name' => '',
+            'position' => ''
+        ];
+
+        $uri = route('api.status.create');
+        $response = $this->postJson($uri, $formData);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJson([
+            'errors' => [
+                'name' => [
+                    0 => 'Status name is required.'
+                ],
+                'position' => [
+                    0 => 'Position is required.'
+                ]
+            ]
+        ]);
+
+        // validate the name exists
+        $formData = [
+            'name' => 'Status 2',
+            'position' => 4
+        ];
+        $uri = route('api.status.create');
+        $response = $this->postJson($uri, $formData);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJson([
+            'errors' => [
+                'name' => [
+                    0 => 'Status name already used.'
+                ]
+            ]
+        ]);
+    }
+
     public function test_create_new_status()
     {
         $user = User::factory()->create();
@@ -34,7 +87,7 @@ class StatusControllerTest extends TestCase
             ['id' => (string)Str::uuid(), 'name' => 'Status 3', 'position' => 3, 'user_id' => $user->id, 'created_at' => now()]
         ]);
 
-        Sanctum::actingAs($user,  ['*']);
+        Sanctum::actingAs($user, ['*']);
 
         $formData = [
             'name' => 'New Status',
@@ -43,7 +96,7 @@ class StatusControllerTest extends TestCase
 
         $uri = route('api.status.create');
 
-        $response = $this->post($uri, $formData);
+        $response = $this->postJson($uri, $formData);
 
         $response->assertStatus(Response::HTTP_CREATED);
         $response->assertJson($formData);
