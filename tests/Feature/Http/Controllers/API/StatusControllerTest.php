@@ -40,23 +40,28 @@ class StatusControllerTest extends TestCase
         $response = $this->getJson($uri);
 
         $response->assertOk();
-        $response->assertJson(['data' => [
-            [
-                'id' => $statuses[0]->id,
-                'name' => $statuses[0]->name,
-                'position' => $statuses[0]->position
+        $response->assertSimilarJson([
+            'data' => [
+                [
+                    'id' => $statuses[0]->id,
+                    'name' => $statuses[0]->name,
+                    'position' => $statuses[0]->position
+                ],
+                [
+                    'id' => $statuses[1]->id,
+                    'name' => $statuses[1]->name,
+                    'position' => $statuses[1]->position
+                ],
+                [
+                    'id' => $statuses[2]->id,
+                    'name' => $statuses[2]->name,
+                    'position' => $statuses[2]->position
+                ],
             ],
-            [
-                'id' => $statuses[1]->id,
-                'name' => $statuses[1]->name,
-                'position' => $statuses[1]->position
-            ],
-            [
-                'id' => $statuses[2]->id,
-                'name' => $statuses[2]->name,
-                'position' => $statuses[2]->position
-            ],
-        ]]);
+            'links' => [
+                'self' => 'link-value',
+            ]
+        ]);
 
     }
 
@@ -282,11 +287,26 @@ class StatusControllerTest extends TestCase
 
         $status = Status::where('name', 'Status 1')->first();
 
+        $taskId = (string)Str::uuid();
+
+        DB::table('tasks')->insert([
+            'id' => $taskId,
+            'user_id' => $user->id,
+            'name' => 'Go to the store',
+            'status_id' => $status->id,
+        ]);
+
         Sanctum::actingAs($user, ['*']);
 
         $uri = route('api.status.delete', [$status]);
         $response = $this->deleteJson($uri);
 
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJson(['message' => 'Cannot delete a status with active tasks']);
+
+        DB::table('tasks')->delete($taskId);
+
+        $response = $this->deleteJson($uri);
         $response->assertStatus(Response::HTTP_NO_CONTENT);
         $this->assertSoftDeleted('statuses', ['id' => $status->id, 'name' => $status->name, 'user_id' => $user->id]);
     }

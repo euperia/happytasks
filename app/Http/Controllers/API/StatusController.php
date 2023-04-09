@@ -80,6 +80,11 @@ class StatusController extends Controller
         if (auth()->user()->id !== $status->user_id) {
             throw new UnauthorizedHttpException('Access Denied');
         }
+
+        if ($status->tasks()->count() > 0) {
+            return response()->json(['message' => 'Cannot delete a status with active tasks'], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
         $status->delete();
         return response(null, Response::HTTP_NO_CONTENT);
     }
