@@ -44,11 +44,20 @@ class StatusController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the status.
      */
     public function update(UpdateStatusRequest $request, Status $status)
     {
-        dd($request->all());
+        $data = $request->validated();
+        if ($data['position'] != $status->position) {
+            // update all other positions
+            Status::where('user_id', auth()->user()->id)
+            ->where('position', '>=', $data['position'])
+            ->increment('position');
+        }
+
+        $status->update($data);
+        return new StatusResource($status);
     }
 
     /**

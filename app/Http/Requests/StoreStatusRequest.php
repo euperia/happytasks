@@ -36,6 +36,4 @@ class StoreStatusRequest extends FormRequest
             'position.gt' => 'Position must be a number greater than zero',
         ];
     }
-
-
 }

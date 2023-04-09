@@ -32,5 +32,6 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
     Route::prefix('status')->group(function() {
        Route::get('/{status}', [StatusController::class, 'show'])->name('api.status.get');
        Route::post('/', [StatusController::class, 'store'])->name('api.status.create');
+       Route::put('/{status}', [StatusController::class, 'update'])->name('api.status.update');
     });
 });

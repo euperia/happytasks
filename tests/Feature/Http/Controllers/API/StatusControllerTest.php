@@ -95,7 +95,6 @@ class StatusControllerTest extends TestCase
         ];
 
         $uri = route('api.status.create');
-
         $response = $this->postJson($uri, $formData);
 
         $response->assertStatus(Response::HTTP_CREATED);
@@ -108,5 +107,103 @@ class StatusControllerTest extends TestCase
         $this->assertDatabaseHas('statuses', ['name' => 'Status 3', 'position' => 4]);
     }
 
+    public function test_update_existing_status()
+    {
+        // test we can update an existing status
 
+        // 1. test status exists
+        // 2. test validation
+        // 3. test we can't update to an existing name
+
+        $user = User::factory()->create();
+
+        // add three new statuses so that we can check the position update
+
+        DB::table('statuses')->insert([
+            ['id' => (string)Str::uuid(), 'name' => 'Status 1', 'position' => 1, 'user_id' => $user->id, 'created_at' => now()],
+            ['id' => (string)Str::uuid(), 'name' => 'Status 2', 'position' => 2, 'user_id' => $user->id, 'created_at' => now()],
+            ['id' => (string)Str::uuid(), 'name' => 'Status 3', 'position' => 3, 'user_id' => $user->id, 'created_at' => now()]
+        ]);
+
+        Sanctum::actingAs($user, ['*']);
+
+        // validate empty data
+        $formData = [
+            'name' => '',
+            'position' => ''
+        ];
+
+        $status = Status::where('name', 'Status 2')->first();
+
+        $uri = route('api.status.update', [$status]);
+        $response = $this->putJson($uri, $formData);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJson([
+            'errors' => [
+                'name' => [
+                    0 => 'Status name is required.'
+                ],
+                'position' => [
+                    0 => 'Position is required.'
+                ]
+            ]
+        ]);
+
+        // validate name exists already
+        $formData = [
+            'name' => 'Status 1',
+            'position' => '5'
+        ];
+
+        $status = Status::where('name', 'Status 2')->first();
+
+        $uri = route('api.status.update', [$status]);
+        $response = $this->putJson($uri, $formData);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJson([
+            'errors' => [
+                'name' => [
+                    0 => 'Status name already used.'
+                ]
+            ]
+        ]);
+
+        // Update name only
+        $formData = [
+            'name' => 'Updated Status',
+            'position' => 2
+        ];
+
+        $status = Status::where('name', 'Status 2')->first();
+
+        $uri = route('api.status.update', [$status]);
+        $response = $this->putJson($uri, $formData);
+
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJson($formData);
+
+        $this->assertDatabaseHas('statuses', $formData);
+
+
+        // Update position only
+        $formData = [
+            'name' => 'Updated Status',
+            'position' => 1
+        ];
+
+        $status->refresh();
+
+        $uri = route('api.status.update', [$status]);
+        $response = $this->putJson($uri, $formData);
+
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJson($formData);
+
+        $this->assertDatabaseHas('statuses', $formData);
+        $this->assertDatabaseHas('statuses', ['name' => 'Status 1' , 'position' => 2]);
+        $this->assertDatabaseHas('statuses', ['name' => 'Status 3' , 'position' => 4]);
+
+    }
 }
