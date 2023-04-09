@@ -269,4 +269,25 @@ class StatusControllerTest extends TestCase
         $this->assertDatabaseHas('statuses', ['name' => 'Status 3', 'position' => 4]);
 
     }
+
+    public function test_delete_a_status()
+    {
+        $user = User::factory()->create();
+        // add three new statuses so that we can check the position update
+        DB::table('statuses')->insert([
+            ['id' => (string)Str::uuid(), 'name' => 'Status 1', 'position' => 1, 'user_id' => $user->id, 'created_at' => now()],
+            ['id' => (string)Str::uuid(), 'name' => 'Status 2', 'position' => 2, 'user_id' => $user->id, 'created_at' => now()],
+            ['id' => (string)Str::uuid(), 'name' => 'Status 3', 'position' => 3, 'user_id' => $user->id, 'created_at' => now()]
+        ]);
+
+        $status = Status::where('name', 'Status 1')->first();
+
+        Sanctum::actingAs($user, ['*']);
+
+        $uri = route('api.status.delete', [$status]);
+        $response = $this->deleteJson($uri);
+
+        $response->assertStatus(Response::HTTP_NO_CONTENT);
+        $this->assertSoftDeleted('statuses', ['id' => $status->id, 'name' => $status->name, 'user_id' => $user->id]);
+    }
 }

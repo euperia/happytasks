@@ -8,12 +8,13 @@ use App\Http\Requests\UpdateStatusRequest;
 use App\Http\Resources\StatusCollectionResource;
 use App\Http\Resources\StatusResource;
 use App\Models\Status;
+use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class StatusController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * List statuses
      */
     public function index()
     {
@@ -26,7 +27,7 @@ class StatusController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a new status
      */
     public function store(StoreStatusRequest $request)
     {
@@ -39,15 +40,14 @@ class StatusController extends Controller
         $status = Status::create($data);
 
         return new StatusResource($status);
-
     }
 
     /**
-     * Display the specified resource.
+     * Get a single status
      */
     public function show(Status $status)
     {
-        // authorize this?
+        // authorize this
         if (auth()->user()->id !== $status->user_id) {
             throw new UnauthorizedHttpException('Access Denied');
         }
@@ -72,10 +72,15 @@ class StatusController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete the status
      */
     public function destroy(Status $status)
     {
-        dd($status->toArray());
+        // authorize this
+        if (auth()->user()->id !== $status->user_id) {
+            throw new UnauthorizedHttpException('Access Denied');
+        }
+        $status->delete();
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

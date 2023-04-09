@@ -34,5 +34,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/{status}', [StatusController::class, 'show'])->name('api.status.get');
         Route::post('/', [StatusController::class, 'store'])->name('api.status.create');
         Route::put('/{status}', [StatusController::class, 'update'])->name('api.status.update');
+        Route::delete('/{status}', [StatusController::class, 'destroy'])->name('api.status.delete');
     });
 });
