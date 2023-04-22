@@ -1,9 +1,10 @@
 <?php
 
+use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\StatusController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,5 +36,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/', [StatusController::class, 'store'])->name('api.status.create');
         Route::put('/{status}', [StatusController::class, 'update'])->name('api.status.update');
         Route::delete('/{status}', [StatusController::class, 'destroy'])->name('api.status.delete');
+    });
+
+    // Category routes
+
+    Route::prefix('category')->group(function () {
+        Route::get('/{category}', [CategoryController::class, 'show'])->name('api.category.get');
+        Route::get('/', [CategoryController::class, 'index'])->name('api.category.list');
     });
 });
