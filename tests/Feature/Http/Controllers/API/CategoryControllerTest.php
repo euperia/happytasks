@@ -3,6 +3,7 @@
 namespace Tests\Feature\Http\Controllers\API;
 
 use App\Models\Category;
+use App\Models\Task;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Response;
@@ -134,12 +135,117 @@ class CategoryControllerTest extends TestCase
 
 
     /**
-     * @todo test update a category
+     * Test update a category
      * Don't allow duplicate names with same parent_id
      */
+    public function test_it_updates_a_category()
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user, ['*']);
+
+        $description = 'Testing the update - this should be the same after';
+        $category = Category::create([
+            'name' => 'Parent Category',
+            'description' => $description,
+            'position' => 2
+        ]);
+
+        $this->assertSame($category->position, 2);
+
+        $uri = route('api.category.update', $category);
+
+        $updateData = [
+            'name' => 'Updated Parent Category',
+            'position' => 1
+        ];
+        $response = $this->put($uri, $updateData);
+
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJson([
+            'name' => $updateData['name'],
+            'description' => $description,
+            'position' => $updateData['position']
+        ]);
+
+    }
+
+    public function test_it_updates_a_category_parent()
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user, ['*']);
+
+        $category1 = Category::create([
+            'name' => 'Parent Category 1',
+            'position' => 1
+        ]);
+        $category2 = Category::create([
+            'name' => 'Parent Category 2',
+            'position' => 2
+        ]);
+
+        $category3 = Category::create([
+            'name' => 'Child 1 Category',
+            'position' => 1,
+            'parent_id' => $category1->id
+        ]);
+
+        $uri = route('api.category.update', $category3);
+
+        $updateData = [
+            'name' => 'Updated Child Category',
+            'parent_id' => $category2->id
+        ];
+
+        $response = $this->put($uri, $updateData);
+
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJson([
+            'name' => $updateData['name'],
+            'parent_id' => $category2->id
+        ]);
+
+    }
 
     /**
-     * @todo Test delete a category
-     * Only if no tasks assigned
+     * Test delete a category
+     * if a category has tasks, cannot delete the category
      */
+    public function test_category_with_tasks_cannot_be_deleted()
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user, ['*']);
+
+        $category = Category::create([
+            'name' => 'Parent Category 1',
+            'position' => 1
+        ]);
+
+        Task::factory(2)->create(['category_id' => $category->id]);
+
+        $uri = route('api.category.delete', $category);
+
+        $response = $this->delete($uri);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJson(['message' => 'Cannot delete - has active tasks']);
+
+    }
+
+    public function test_category_can_be_deleted()
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user, ['*']);
+
+        $category = Category::create([
+            'name' => 'Parent Category 1',
+            'position' => 1
+        ]);
+
+        $uri = route('api.category.delete', $category);
+
+        $response = $this->delete($uri);
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJson(['message' => 'Deleted OK']);
+
+        $this->assertSoftDeleted('categories', ['id' => $category->id]);
+    }
 }
