@@ -11,8 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Task extends Model
 {
-    use HasFactory, SoftDeletes, UsesUuid, UsesUserId,
-        TaskRelationships;
+    use HasFactory, SoftDeletes, UsesUuid, UsesUserId, TaskRelationships;
 
     protected $fillable = [
         'name',

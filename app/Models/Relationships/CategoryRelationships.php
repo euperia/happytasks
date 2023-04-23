@@ -6,6 +6,7 @@ use App\Models\Task;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 trait CategoryRelationships
 {
@@ -20,4 +21,15 @@ trait CategoryRelationships
         return $this->hasMany(Task::class);
     }
 
+    public function parent(): HasOne
+    {
+        return $this->hasOne(self::class, 'id', 'parent_id');
+    }
+
+    public function children(): HasMany
+    {
+        return $this->hasMany(self::class, 'parent_id', 'id')
+            ->orderBy('position')
+            ->with('children');
+    }
 }
