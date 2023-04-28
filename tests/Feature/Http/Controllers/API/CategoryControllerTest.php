@@ -4,16 +4,15 @@ namespace Tests\Feature\Http\Controllers\API;
 
 use App\Models\Category;
 use App\Models\Task;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class CategoryControllerTest extends TestCase
 {
+
     use RefreshDatabase;
 
     public function testStatusAuthFail()
@@ -25,7 +24,7 @@ class CategoryControllerTest extends TestCase
 
     public function test_get_a_category()
     {
-        $user = User::factory()->create();
+        $this->setUpUser();
 
         // add three new statuses so that we can check the position update
         DB::table('categories')->insert([
@@ -34,7 +33,7 @@ class CategoryControllerTest extends TestCase
                 'name' => 'Category 1',
                 'description' => 'Description of category 1',
                 'position' => 1,
-                'user_id' => $user->id, 'created_at' => now()
+                'user_id' => $this->user->id, 'created_at' => now()
             ]
         ]);
 
@@ -42,7 +41,6 @@ class CategoryControllerTest extends TestCase
 
         $uri = route('api.category.get', [$model]);
 
-        Sanctum::actingAs($user, ['*']);
         $response = $this->getJson($uri);
 
         $response->assertOk();
@@ -61,8 +59,7 @@ class CategoryControllerTest extends TestCase
      */
     public function test_get_category_list()
     {
-        $user = User::factory()->create();
-        Sanctum::actingAs($user, ['*']);
+       $this->setUpUser();
 
         // create 5 categories
         $categories = Category::factory(5)->create();
@@ -84,8 +81,7 @@ class CategoryControllerTest extends TestCase
      */
     public function test_it_creates_a_category()
     {
-        $user = User::factory()->create();
-        Sanctum::actingAs($user, ['*']);
+        $this->setUpUser();
 
         $data = [
             'name' => 'AE Smith & Son',
@@ -106,8 +102,7 @@ class CategoryControllerTest extends TestCase
 
     public function test_it_creates_a_child_category()
     {
-        $user = User::factory()->create();
-        Sanctum::actingAs($user, ['*']);
+        $this->setUpUser();
 
 
         $parent = Category::create([
@@ -140,8 +135,7 @@ class CategoryControllerTest extends TestCase
      */
     public function test_it_updates_a_category()
     {
-        $user = User::factory()->create();
-        Sanctum::actingAs($user, ['*']);
+       $this->setUpUser();
 
         $description = 'Testing the update - this should be the same after';
         $category = Category::create([
@@ -171,8 +165,7 @@ class CategoryControllerTest extends TestCase
 
     public function test_it_updates_a_category_parent()
     {
-        $user = User::factory()->create();
-        Sanctum::actingAs($user, ['*']);
+        $this->setUpUser();
 
         $category1 = Category::create([
             'name' => 'Parent Category 1',
@@ -212,8 +205,7 @@ class CategoryControllerTest extends TestCase
      */
     public function test_category_with_tasks_cannot_be_deleted()
     {
-        $user = User::factory()->create();
-        Sanctum::actingAs($user, ['*']);
+        $this->setUpUser();
 
         $category = Category::create([
             'name' => 'Parent Category 1',
@@ -232,8 +224,7 @@ class CategoryControllerTest extends TestCase
 
     public function test_category_can_be_deleted()
     {
-        $user = User::factory()->create();
-        Sanctum::actingAs($user, ['*']);
+        $this->setUpUser();
 
         $category = Category::create([
             'name' => 'Parent Category 1',

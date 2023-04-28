@@ -27,3 +27,4 @@ CMD ["php-fpm"]
 EXPOSE 9000
 
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
+COPY xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini

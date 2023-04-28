@@ -23,13 +23,12 @@ class CategoryTest extends TestCase
     {
 
 
-        $user = $this->user();
-        $this->actingAs($user);
+        $this->setUpUser();
 
         $data = ['name' => 'Test', 'description' => 'This is a test', 'position' => 1];
         $category = Category::create($data);
 
-        $this->assertSame($category->user_id, $user->id);
+        $this->assertSame($category->user_id, $this->user->id);
         $this->assertSame($category->name, $data['name']);
         $this->assertSame($category->description, $data['description']);
         $this->assertSame($category->position, $data['position']);
