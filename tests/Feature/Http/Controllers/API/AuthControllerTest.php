@@ -4,10 +4,8 @@ namespace Tests\Feature\Http\Controllers\API;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
-use Inertia\Response;
-use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Tests\TestCase;
 
 class AuthControllerTest extends TestCase
@@ -30,7 +28,7 @@ class AuthControllerTest extends TestCase
         ];
 
         $response = $this->post(route('api.register', $formData));
-        $response->assertStatus(ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
 
         $response->assertJsonFragment(['email' => ['The email field is required.']]);
         $response->assertJsonFragment(['name' => ['The name field is required.']]);
@@ -45,7 +43,7 @@ class AuthControllerTest extends TestCase
         ];
 
         $response = $this->post(route('api.register', $formData));
-        $response->assertStatus(ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
 
         $response->assertJsonFragment(['email' => ['The email field is required.']]);
         $response->assertJsonFragment(['password' => ['The password field is required.']]);
@@ -59,7 +57,7 @@ class AuthControllerTest extends TestCase
         ];
 
         $response = $this->post(route('api.register', $formData));
-        $response->assertStatus(ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
 
         $response->assertJsonFragment(['email' => ['The email field must be a valid email address.']]);
         $response->assertJsonFragment(['password' => ['The password field is required.']]);
@@ -73,7 +71,7 @@ class AuthControllerTest extends TestCase
         ];
 
         $response = $this->post(route('api.register', $formData));
-        $response->assertStatus(ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
 
         $response->assertJsonFragment(['password' => [
             "The password field confirmation does not match.",
@@ -91,7 +89,7 @@ class AuthControllerTest extends TestCase
         ];
 
         $response = $this->post(route('api.register', $formData));
-        $response->assertStatus(ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
 
         $response->assertJsonFragment(['password' => [
             "The password field confirmation does not match.",
@@ -111,7 +109,7 @@ class AuthControllerTest extends TestCase
         ];
 
         $response = $this->post(route('api.register', $formData));
-        $response->assertStatus(ResponseAlias::HTTP_OK);
+        $response->assertStatus(Response::HTTP_OK);
 
         $response->assertJson([
             'data' => [

@@ -31,8 +31,7 @@ class TaskTest extends TestCase
     public function test_it_creates_task_with_uuid_and_user(): void
     {
 
-        $user = $this->user();
-        $this->actingAs($user);
+        $this->setUpUser();
 
         $data = [
             'name' => 'Test',
@@ -44,19 +43,18 @@ class TaskTest extends TestCase
 
         $task = Task::create($data);
 
-        $this->assertSame($task->user_id, $user->id);
+        $this->assertSame($task->user_id, $this->user->id);
         $this->assertSame($task->name, $data['name']);
         $this->assertSame($task->description, $data['description']);
         $this->assertSame($task->notes, $data['notes']);
         $this->assertSame($task->due_at, $data['due_at']);
         $this->assertSame($task->duration, $data['duration']);
-        $this->assertSame($task->user->name, $user->name);
+        $this->assertSame($task->user->name, $this->user->name);
     }
 
     public function test_task_has_category()
     {
-        $user = $this->user();
-        $this->actingAs($user);
+        $this->setUpUser();
 
         $categoryData = ['name' => 'Test', 'description' => 'This is a test', 'position' => 1];
         $category = Category::create($categoryData);
@@ -81,8 +79,7 @@ class TaskTest extends TestCase
 
     public function test_task_has_status()
     {
-        $user = $this->user();
-        $this->actingAs($user);
+        $this->setUpUser();
 
         $statusData = ['name' => 'In Progress', 'position' => 2];
         $status = Status::create($statusData);
@@ -107,8 +104,7 @@ class TaskTest extends TestCase
 
     public function test_task_has_status_and_category()
     {
-        $user = $this->user();
-        $this->actingAs($user);
+        $this->setUpUser();
 
         $statusData = ['name' => 'In Progress', 'position' => 2];
         $status = Status::create($statusData);

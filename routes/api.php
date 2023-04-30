@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\StatusController;
+use App\Http\Controllers\API\TaskController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -46,5 +47,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/', [CategoryController::class, 'store'])->name('api.category.create');
         Route::put('/{category}', [CategoryController::class, 'update'])->name('api.category.update');
         Route::delete('/{category}', [CategoryController::class, 'delete'])->name('api.category.delete');
+    });
+
+    // Task routes
+    Route::prefix('task')->group(function () {
+        Route::get('/{task}', [TaskController::class, 'show'])->name('api.task.get');
+        Route::get('/', [TaskController::class, 'index'])->name('api.task.list');
+        Route::post('/', [TaskController::class, 'store'])->name('api.task.create');
+        Route::patch('/{task}', [TaskController::class, 'update'])->name('api.task.update');
+        Route::delete('/{task}', [TaskController::class, 'destroy'])->name('api.task.delete');
     });
 });

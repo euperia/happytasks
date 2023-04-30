@@ -22,14 +22,12 @@ class StatusTest extends TestCase
     public function test_it_creates_status_with_uuid_and_user(): void
     {
 
-
-        $user = $this->user();
-        $this->actingAs($user);
+        $this->setUpUser();
 
         $data = ['name' => 'Test', 'position' => 1];
         $status = Status::create($data);
 
-        $this->assertSame($status->user_id, $user->id);
+        $this->assertSame($status->user_id, $this->user->id);
         $this->assertSame($status->name, $data['name']);
         $this->assertSame($status->position, $data['position']);
     }

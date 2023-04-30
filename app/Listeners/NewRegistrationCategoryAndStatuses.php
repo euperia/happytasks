@@ -2,9 +2,9 @@
 
 namespace App\Listeners;
 
+use App\Events\NewRegistration;
 use App\Models\Category;
 use App\Models\Status;
-use App\Events\NewRegistration;
 
 class NewRegistrationCategoryAndStatuses
 {

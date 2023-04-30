@@ -4,13 +4,17 @@ namespace Tests;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Laravel\Sanctum\Sanctum;
 
 abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication;
 
-    protected function user()
+    protected User $user;
+
+    protected function setUpUser()
     {
-        return (User::factory()->create());
+        $this->user = User::factory()->create();
+        Sanctum::actingAs($this->user, ['*']);
     }
 }

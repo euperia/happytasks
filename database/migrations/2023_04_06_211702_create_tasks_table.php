@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('url')->nullable();
             $table->text('description')->nullable();
             $table->text('notes')->nullable();
-            $table->dateTime('due_at')->nullable();
-            $table->unsignedTinyInteger('duration')->nullable();
+            $table->unsignedInteger('duration')->nullable();
+            $table->timestamp('due_at', 0)->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

@@ -220,23 +220,23 @@ return [
         'statuses' => [
             [
                 'name' => 'Not Started',
-                'position' => 1
+                'position' => 10
             ],
             [
                 'name' => 'In Progress',
-                'position' => 2
+                'position' => 20
             ],
             [
                 'name' => 'Paused',
-                'position' => 3
+                'position' => 30
             ],
             [
                 'name' => 'Awaiting Approval',
-                'position' => 4
+                'position' => 40
             ],
             [
                 'name' => 'Completed',
-                'position' =>  5
+                'position' =>  50
             ],
         ],
     ],

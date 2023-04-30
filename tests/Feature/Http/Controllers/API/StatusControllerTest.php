@@ -3,12 +3,10 @@
 namespace Tests\Feature\Http\Controllers\API;
 
 use App\Models\Status;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class StatusControllerTest extends TestCase
@@ -24,17 +22,16 @@ class StatusControllerTest extends TestCase
 
     public function test_list_statuses()
     {
-        $user = User::factory()->create();
+        $this->setUpUser();
+
         // add three new statuses so that we can check the position update
         DB::table('statuses')->insert([
-            ['id' => (string)Str::uuid(), 'name' => 'Status 1', 'position' => 1, 'user_id' => $user->id, 'created_at' => now()],
-            ['id' => (string)Str::uuid(), 'name' => 'Status 2', 'position' => 2, 'user_id' => $user->id, 'created_at' => now()],
-            ['id' => (string)Str::uuid(), 'name' => 'Status 3', 'position' => 3, 'user_id' => $user->id, 'created_at' => now()]
+            ['id' => (string)Str::uuid(), 'name' => 'Status 1', 'position' => 1, 'user_id' => $this->user->id, 'created_at' => now()],
+            ['id' => (string)Str::uuid(), 'name' => 'Status 2', 'position' => 2, 'user_id' => $this->user->id, 'created_at' => now()],
+            ['id' => (string)Str::uuid(), 'name' => 'Status 3', 'position' => 3, 'user_id' => $this->user->id, 'created_at' => now()]
         ]);
 
         $statuses = Status::all();
-
-        Sanctum::actingAs($user, ['*']);
 
         $uri = route('api.status.list');
         $response = $this->getJson($uri);
@@ -67,17 +64,16 @@ class StatusControllerTest extends TestCase
 
     public function test_get_a_status()
     {
-        $user = User::factory()->create();
+        $this->setUpUser();
+
         // add three new statuses so that we can check the position update
         DB::table('statuses')->insert([
-            ['id' => (string)Str::uuid(), 'name' => 'Status 1', 'position' => 1, 'user_id' => $user->id, 'created_at' => now()],
-            ['id' => (string)Str::uuid(), 'name' => 'Status 2', 'position' => 2, 'user_id' => $user->id, 'created_at' => now()],
-            ['id' => (string)Str::uuid(), 'name' => 'Status 3', 'position' => 3, 'user_id' => $user->id, 'created_at' => now()]
+            ['id' => (string)Str::uuid(), 'name' => 'Status 1', 'position' => 1, 'user_id' => $this->user->id, 'created_at' => now()],
+            ['id' => (string)Str::uuid(), 'name' => 'Status 2', 'position' => 2, 'user_id' => $this->user->id, 'created_at' => now()],
+            ['id' => (string)Str::uuid(), 'name' => 'Status 3', 'position' => 3, 'user_id' => $this->user->id, 'created_at' => now()]
         ]);
 
         $status = Status::where('name', 'Status 2')->first();
-
-        Sanctum::actingAs($user, ['*']);
 
         $uri = route('api.status.get', [$status]);
         $response = $this->getJson($uri);
@@ -94,15 +90,14 @@ class StatusControllerTest extends TestCase
     public function test_create_new_status_validation()
     {
 
-        $user = User::factory()->create();
+        $this->setUpUser();
+
         // add three new statuses so that we can check the position update
         DB::table('statuses')->insert([
-            ['id' => (string)Str::uuid(), 'name' => 'Status 1', 'position' => 1, 'user_id' => $user->id, 'created_at' => now()],
-            ['id' => (string)Str::uuid(), 'name' => 'Status 2', 'position' => 2, 'user_id' => $user->id, 'created_at' => now()],
-            ['id' => (string)Str::uuid(), 'name' => 'Status 3', 'position' => 3, 'user_id' => $user->id, 'created_at' => now()]
+            ['id' => (string)Str::uuid(), 'name' => 'Status 1', 'position' => 1, 'user_id' => $this->user->id, 'created_at' => now()],
+            ['id' => (string)Str::uuid(), 'name' => 'Status 2', 'position' => 2, 'user_id' => $this->user->id, 'created_at' => now()],
+            ['id' => (string)Str::uuid(), 'name' => 'Status 3', 'position' => 3, 'user_id' => $this->user->id, 'created_at' => now()]
         ]);
-
-        Sanctum::actingAs($user, ['*']);
 
         // validate empty input
         $formData = [
@@ -145,17 +140,15 @@ class StatusControllerTest extends TestCase
 
     public function test_create_new_status()
     {
-        $user = User::factory()->create();
+        $this->setUpUser();
 
         // add three new statuses so that we can check the position update
 
         DB::table('statuses')->insert([
-            ['id' => (string)Str::uuid(), 'name' => 'Status 1', 'position' => 1, 'user_id' => $user->id, 'created_at' => now()],
-            ['id' => (string)Str::uuid(), 'name' => 'Status 2', 'position' => 2, 'user_id' => $user->id, 'created_at' => now()],
-            ['id' => (string)Str::uuid(), 'name' => 'Status 3', 'position' => 3, 'user_id' => $user->id, 'created_at' => now()]
+            ['id' => (string)Str::uuid(), 'name' => 'Status 1', 'position' => 1, 'user_id' => $this->user->id, 'created_at' => now()],
+            ['id' => (string)Str::uuid(), 'name' => 'Status 2', 'position' => 2, 'user_id' => $this->user->id, 'created_at' => now()],
+            ['id' => (string)Str::uuid(), 'name' => 'Status 3', 'position' => 3, 'user_id' => $this->user->id, 'created_at' => now()]
         ]);
-
-        Sanctum::actingAs($user, ['*']);
 
         $formData = [
             'name' => 'New Status',
@@ -183,17 +176,15 @@ class StatusControllerTest extends TestCase
         // 2. test validation
         // 3. test we can't update to an existing name
 
-        $user = User::factory()->create();
+        $this->setUpUser();
 
         // add three new statuses so that we can check the position update
 
         DB::table('statuses')->insert([
-            ['id' => (string)Str::uuid(), 'name' => 'Status 1', 'position' => 1, 'user_id' => $user->id, 'created_at' => now()],
-            ['id' => (string)Str::uuid(), 'name' => 'Status 2', 'position' => 2, 'user_id' => $user->id, 'created_at' => now()],
-            ['id' => (string)Str::uuid(), 'name' => 'Status 3', 'position' => 3, 'user_id' => $user->id, 'created_at' => now()]
+            ['id' => (string)Str::uuid(), 'name' => 'Status 1', 'position' => 1, 'user_id' => $this->user->id, 'created_at' => now()],
+            ['id' => (string)Str::uuid(), 'name' => 'Status 2', 'position' => 2, 'user_id' => $this->user->id, 'created_at' => now()],
+            ['id' => (string)Str::uuid(), 'name' => 'Status 3', 'position' => 3, 'user_id' => $this->user->id, 'created_at' => now()]
         ]);
-
-        Sanctum::actingAs($user, ['*']);
 
         // validate empty data
         $formData = [
@@ -277,12 +268,12 @@ class StatusControllerTest extends TestCase
 
     public function test_delete_a_status()
     {
-        $user = User::factory()->create();
+        $this->setUpUser();
         // add three new statuses so that we can check the position update
         DB::table('statuses')->insert([
-            ['id' => (string)Str::uuid(), 'name' => 'Status 1', 'position' => 1, 'user_id' => $user->id, 'created_at' => now()],
-            ['id' => (string)Str::uuid(), 'name' => 'Status 2', 'position' => 2, 'user_id' => $user->id, 'created_at' => now()],
-            ['id' => (string)Str::uuid(), 'name' => 'Status 3', 'position' => 3, 'user_id' => $user->id, 'created_at' => now()]
+            ['id' => (string)Str::uuid(), 'name' => 'Status 1', 'position' => 1, 'user_id' => $this->user->id, 'created_at' => now()],
+            ['id' => (string)Str::uuid(), 'name' => 'Status 2', 'position' => 2, 'user_id' => $this->user->id, 'created_at' => now()],
+            ['id' => (string)Str::uuid(), 'name' => 'Status 3', 'position' => 3, 'user_id' => $this->user->id, 'created_at' => now()]
         ]);
 
         $status = Status::where('name', 'Status 1')->first();
@@ -291,12 +282,10 @@ class StatusControllerTest extends TestCase
 
         DB::table('tasks')->insert([
             'id' => $taskId,
-            'user_id' => $user->id,
+            'user_id' => $this->user->id,
             'name' => 'Go to the store',
             'status_id' => $status->id,
         ]);
-
-        Sanctum::actingAs($user, ['*']);
 
         $uri = route('api.status.delete', [$status]);
         $response = $this->deleteJson($uri);
@@ -308,6 +297,6 @@ class StatusControllerTest extends TestCase
 
         $response = $this->deleteJson($uri);
         $response->assertStatus(Response::HTTP_NO_CONTENT);
-        $this->assertSoftDeleted('statuses', ['id' => $status->id, 'name' => $status->name, 'user_id' => $user->id]);
+        $this->assertSoftDeleted('statuses', ['id' => $status->id, 'name' => $status->name, 'user_id' => $this->user->id]);
     }
 }
